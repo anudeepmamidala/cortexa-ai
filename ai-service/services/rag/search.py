@@ -1,8 +1,8 @@
 from services.rag.retriever import get_retriever
 
 
-def search(query: str) -> str:
-    retriever = get_retriever()
+def search(query: str, collection_name: str = "default_workspace") -> str:
+    retriever = get_retriever(collection_name=collection_name)
 
     documents = retriever.invoke(query)
 

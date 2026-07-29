@@ -7,7 +7,7 @@ orchestrator = OrchestratorAgent()
 def orchestrator_node(state: GraphState):
 
     route = orchestrator.invoke(
-        state["messages"][-1].content
+        state["messages"]
     )
 
     return {

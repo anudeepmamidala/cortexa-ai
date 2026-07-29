@@ -33,3 +33,21 @@ memory = MemorySaver()
 graph = builder.compile(
     checkpointer=memory
 )
+
+
+# --- Pipeline mode: planner -> coding -> reviewer, sequential chain ---
+
+pipeline_builder = StateGraph(GraphState)
+
+pipeline_builder.add_node("planner", planner_node)
+pipeline_builder.add_node("coding", coding_node)
+pipeline_builder.add_node("reviewer", reviewer_node)
+
+pipeline_builder.add_edge(START, "planner")
+pipeline_builder.add_edge("planner", "coding")
+pipeline_builder.add_edge("coding", "reviewer")
+pipeline_builder.add_edge("reviewer", END)
+
+pipeline_graph = pipeline_builder.compile(
+    checkpointer=memory
+)

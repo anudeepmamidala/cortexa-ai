@@ -6,6 +6,8 @@ from tools.file_tools import (
     read_multiple_files,
 )
 from tools.rag_tools import search_documents
+from tools.url_tools import analyze_url
+
 FILE_TOOLS = [
     read_file,
     write_file,
@@ -17,7 +19,8 @@ FILE_TOOLS = [
 
 TOOLS = [
     *FILE_TOOLS,
-    search_documents
+    search_documents,
+    analyze_url,
 ]
 
 TOOL_MAP = {
