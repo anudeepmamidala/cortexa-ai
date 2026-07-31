@@ -1,313 +1,59 @@
-# BackendForge AI Service 🚀
+# Cortexa AI — Multi-Agent AI Software Engineering IDE
 
-> AI-powered multi-agent backend service for software engineering assistance built with **FastAPI**, **LangGraph**, and **LangChain**.
+An AI-powered, web-based IDE that combines a live code editor, project workspace, and a multi-agent LangGraph backend to plan, generate, and review code in real time.
 
-BackendForge AI Service is the intelligence layer of the BackendForge platform. It uses a multi-agent architecture to analyze requests, retrieve relevant context using RAG, invoke tools when necessary, and generate high-quality responses through LLMs.
+## Overview
 
----
+Cortexa AI pairs a Monaco-based code editor and file explorer with a multi-agent AI backend. Requests are routed through specialized LangGraph agents that plan, write, and review code, with responses streamed token-by-token to the frontend over Server-Sent Events.
 
-# Features
+## Key Features
 
-- 🤖 Multi-Agent Architecture
-- 🧠 LangGraph Workflow Orchestration
-- 📄 Retrieval-Augmented Generation (RAG)
-- 🔍 Chroma Vector Database
-- 📁 PDF Knowledge Base Support
-- 🛠 Tool Calling
-- 🔄 Provider Abstraction
-- ⚡ FastAPI REST API
-- 📂 File Upload API
-- 📝 Structured Logging
-- 🏗 Modular & Clean Architecture
+- **Multi-Agent Orchestration** — 4 specialized LangGraph agents: **Orchestrator** (routes requests), **Planner** (builds execution plans), **Coding** (writes/refactors code), and **Reviewer** (audits code quality and logic).
+- **Real-Time SSE Streaming** — a reactive Spring Boot (WebFlux) gateway exposes a `Flux<String>` streaming endpoint (`/api/chats/{chatId}/messages/stream`) that relays live tokens from the FastAPI agent service to the React frontend.
+- **RAG-Based Document Retrieval** — a full retrieval pipeline (embeddings, ingestion, vector store, retriever, search) grounds agent responses in uploaded project/documentation context via ChromaDB.
+- **Tool-Calling Agents** — agents call registered tools for file read/write, live URL/web page analysis, and RAG lookups, scoped to the active project workspace.
+- **Workspace & Project Management** — full CRUD for projects, files, and chat sessions, each isolated per authenticated user.
+- **Secured End-to-End** — Spring Security JWT authentication (`JwtAuthenticationFilter`, `JwtService`), BCrypt password hashing (`PasswordEncoderConfig`), and workspace path containment.
 
----
+## Tech Stack
 
-# Tech Stack
+| Layer | Technologies |
+|---|---|
+| Frontend | React 19, Vite, Monaco Editor |
+| Backend | Java, Spring Boot, Spring WebFlux, Spring Security |
+| AI Service | Python, FastAPI, LangGraph, LangChain |
+| RAG / Vector Store | ChromaDB |
+| LLM Provider | Groq |
+| Database | MySQL |
+| Auth | JWT, BCrypt |
 
-| Category | Technology |
-|----------|------------|
-| Language | Python 3.11+ |
-| API Framework | FastAPI |
-| AI Framework | LangChain |
-| Workflow | LangGraph |
-| Vector Database | ChromaDB |
-| Embeddings | Ollama Embeddings |
-| LLM Provider | OpenAI Compatible APIs / Ollama |
-| Validation | Pydantic |
-| Server | Uvicorn |
+## Architecture
+![Architecture]<img width="2816" height="1536" alt="Gemini_Generated_Image_vpc2ouvpc2ouvpc2" src="https://github.com/user-attachments/assets/5cbeff51-dd78-4802-a545-5dc07e196e98" />
 
----
 
-# Architecture
+## Repository Structure
 
 ```
-                   +----------------------+
-                   |      FastAPI API     |
-                   +----------+-----------+
-                              |
-                              v
-                    +--------------------+
-                    |    LangGraph       |
-                    |   Orchestrator     |
-                    +---------+----------+
-                              |
-            +-----------------+------------------+
-            |                                    |
-            v                                    v
-     Planner Agent                      Coding Agent
-            |                                    |
-            +-----------------+------------------+
-                              |
-                              v
-                      Reviewer Agent
-                              |
-                              v
-                     Tool Invocation Layer
-                              |
-          +-------------------+-------------------+
-          |                                       |
-          v                                       v
-      Chroma RAG                           LLM Provider
+cortexa-ai/
+├── ai-service/     # FastAPI multi-agent service
+│   ├── agents/     # orchestrator, planner, coding, reviewer
+│   ├── graph/      # LangGraph builder, router, state, nodes
+│   ├── services/rag/
+│   └── tools/
+└── backend/        # Spring Boot backend
+    └── src/main/java/com/cortexa/backend/
+        ├── auth/
+        ├── chat/
+        ├── file/
+        ├── project/
+        └── security/
 ```
 
----
+## Roadmap
 
-# Project Structure
+- Per-user rate limiting on AI chat endpoints
+- Docker Compose setup for one-command local startup
 
-```
-backendforge-ai-service/
-│
-├── agents/
-│   ├── base_agent.py
-│   ├── planner_agent.py
-│   ├── coding_agent.py
-│   └── reviewer_agent.py
-│
-├── graph/
-│   ├── graph.py
-│   ├── nodes/
-│   └── state.py
-│
-├── rag/
-│   ├── loader.py
-│   ├── embeddings.py
-│   └── retriever.py
-│
-├── providers/
-│
-├── tools/
-│
-├── routers/
-│
-├── uploads/
-│
-├── core/
-│
-├── exceptions/
-│
-├── config/
-│
-├── main.py
-├── requirements.txt
-└── README.md
-```
+## License
 
----
-
-# Workflow
-
-```
-Client Request
-      │
-      ▼
-FastAPI Endpoint
-      │
-      ▼
-LangGraph Orchestrator
-      │
-      ▼
-Planner Agent
-      │
-      ▼
-Coding Agent
-      │
-      ▼
-Reviewer Agent
-      │
-      ▼
-Tool Calls / RAG
-      │
-      ▼
-Final Response
-```
-
----
-
-# API Endpoints
-
-## Chat
-
-```
-POST /chat
-```
-
-Generate AI responses using the multi-agent workflow.
-
----
-
-## Upload Knowledge Base
-
-```
-POST /upload
-```
-
-Upload documents for Retrieval-Augmented Generation.
-
----
-
-## Health Check
-
-```
-GET /
-```
-
-Returns service status.
-
----
-
-# RAG Pipeline
-
-1. Upload PDF
-2. Load document
-3. Split into chunks
-4. Generate embeddings
-5. Store in ChromaDB
-6. Retrieve relevant chunks
-7. Inject context into prompt
-8. Generate response
-
----
-
-# Multi-Agent Pipeline
-
-```
-User Request
-      │
-      ▼
-Planner
-      │
-      ▼
-Coding Agent
-      │
-      ▼
-Reviewer
-      │
-      ▼
-Final Answer
-```
-
-Each agent has a single responsibility and communicates through LangGraph state.
-
----
-
-# Running the Project
-
-## Clone
-
-```bash
-git clone https://github.com/<your-username>/backendforge-ai-service.git
-cd backendforge-ai-service
-```
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-source venv/bin/activate
-```
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## Configure Environment
-
-Create a `.env` file.
-
-```env
-MODEL=your-model
-BASE_URL=your-provider-url
-API_KEY=your-api-key
-```
-
-## Run
-
-```bash
-uvicorn main:app --reload
-```
-
----
-
-# Design Principles
-
-- Clean Architecture
-- Separation of Concerns
-- Agent-Based Design
-- Provider Agnostic
-- Extensible Tool System
-- Modular Components
-
----
-
-# Future Improvements
-
-- Streaming Responses
-- Docker Support
-- Conversation Memory
-- Additional Tool Integrations
-- Authentication
-- Observability
-- Rate Limiting
-- CI/CD Pipeline
-
----
-
-# BackendForge Platform
-
-This repository contains the **AI Service**.
-
-The complete BackendForge platform consists of:
-
-```
-Frontend
-      │
-      ▼
-Spring Boot Backend
-      │
-      ▼
-BackendForge AI Service
-      │
-      ▼
-LLM + ChromaDB
-```
-
-The Spring Boot backend is responsible for authentication, project management, persistence, and communication with the AI Service.
-
----
-
-# License
-
-This project is licensed under the MIT License.
+MIT
