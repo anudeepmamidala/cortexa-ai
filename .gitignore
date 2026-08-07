@@ -68,17 +68,21 @@ nbproject/private/
 Thumbs.db
 
 # ==========================================
+# Node.js
+# ==========================================
+node_modules/
+
+# ==========================================
 # Logs
 # ==========================================
 *.log
 logs/
 
 # ==========================================
-# Runtime / Generated Data
+# Backend Storage
 # ==========================================
-ai-service/data/chroma/
-ai-service/uploads/
-ai-service/memory/
+uploads/
+storage/
 
 # ==========================================
 # Build Artifacts
